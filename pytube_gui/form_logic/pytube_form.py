@@ -183,20 +183,20 @@ class PyTubeForm(MainFormUi):
 
     def _video_download_completed(self):
         """Performs chores when the video download is complete"""
-        self.downloadStatusLabel.setText("")
-        self.progressBar.setValue(1)
+        self.progressBar.setValue(1) # do this first
+        QMessageBox.about(self.dialog_window, "Success!", "Video download complete") # this second
+        self.downloadStatusLabel.setText("") # this third
         self.downloadFolderBrowseButton.setEnabled(True)
         self.startButton.setEnabled(True)
-        QMessageBox.about(self.dialog_window, "Success!", "Video download complete") # show this after setting other values
         del self.thread
 
     
     def _playlist_download_completed(self):
         """Performs chores when the playlist download is complete"""
-        self.downloadStatusLabel.setText("")
+        QMessageBox.about(self.dialog_window, "Success!", "Playlist download complete")  # do this first
+        self.downloadStatusLabel.setText("") # this second
         self.downloadFolderBrowseButton.setEnabled(True)
         self.startButton.setEnabled(True)
-        QMessageBox.about(self.dialog_window, "Success!", "Playlist download complete") # show this after setting other values
         del self.thread
 
    
