@@ -234,6 +234,10 @@ class _VideoDownloaderThread(QThread):
             audio = self.video.streams.filter(only_audio=True).first().download(output_path=self.download_location)
             # rename to .mp3
             base, ext = os.path.splitext(audio)
+            try:
+                os.remove(base + ".mp3") # this file might exist already. if it does, can't perform rename
+            except OSError:
+                pass
             os.rename(audio, base + ".mp3")
         else:
             self.video.streams.get_highest_resolution().download(self.download_location)
