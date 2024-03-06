@@ -9,6 +9,9 @@ try:
 except FileExistsError:
     pass
 
+with open("./pytube_gui/form_ui/__init__.py", "w") as f:
+    f.write("")
+
 for ui_file in glob.glob("./qt-forms/*.ui"):
     file_name = ui_file.split("\\" if platform.system() == "Windows" else "/")[-1] # e.g. from "./qt-forms/form.ui", get "form.ui"
     destination_name = file_name.split(".ui")[0] + ".py" # *.ui to *.py
