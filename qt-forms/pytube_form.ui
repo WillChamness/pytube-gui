@@ -258,7 +258,7 @@
     <enum>Qt::LeftToRight</enum>
    </property>
    <property name="text">
-    <string>Python YouTube Downloader</string>
+    <string>YouTube Downloader</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
