@@ -93,6 +93,9 @@
    <property name="text">
     <string>Browse</string>
    </property>
+   <property name="autoDefault">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QCheckBox" name="audioOnlyCheckbox">
    <property name="geometry">
@@ -195,6 +198,9 @@
    <property name="text">
     <string>Start</string>
    </property>
+   <property name="default">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="cancelButton">
    <property name="geometry">
@@ -207,6 +213,9 @@
    </property>
    <property name="text">
     <string>Cancel</string>
+   </property>
+   <property name="autoDefault">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QLabel" name="videoPlaylistLabel">
