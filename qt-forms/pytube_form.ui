@@ -313,6 +313,17 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>videoPlaylistSelectCombobox</tabstop>
+  <tabstop>urlTextbox</tabstop>
+  <tabstop>downloadFolderTextbox</tabstop>
+  <tabstop>downloadFolderBrowseButton</tabstop>
+  <tabstop>startRangeSpinBox</tabstop>
+  <tabstop>stopRangeSpinBox</tabstop>
+  <tabstop>audioOnlyCheckbox</tabstop>
+  <tabstop>cancelButton</tabstop>
+  <tabstop>startButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
