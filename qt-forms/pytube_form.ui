@@ -321,6 +321,25 @@
     <string>YouTube URL</string>
    </property>
   </widget>
+  <widget class="QCheckBox" name="downloadAllAvailableCheckbox">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>230</y>
+     <width>151</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Download all available</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
  </widget>
  <tabstops>
   <tabstop>videoPlaylistSelectCombobox</tabstop>

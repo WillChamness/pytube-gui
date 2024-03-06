@@ -22,6 +22,7 @@ class PyTubeForm(MainFormUi):
         self.startButton.clicked.connect(self.startButton_clicked)
         self.downloadFolderBrowseButton.clicked.connect(self.downloadFolderBrowseButton_clicked)
         self.videoPlaylistSelectCombobox.currentIndexChanged.connect(self.videoPlaylistSelectCombobox_changed)
+        self.downloadAllAvailableCheckbox.stateChanged.connect(self.downloadAllAvailableCheckbox_changed)
 
 
     def _on_form_load(self):
@@ -117,8 +118,12 @@ class PyTubeForm(MainFormUi):
         download_base_path: str = self.downloadFolderTextbox.text()
         url: str = self.urlTextbox.text()
         # indexes are 1-based on YouTube, so these are also 1-based for the user
-        start_index = self.startRangeSpinBox.value()
-        stop_index = self.stopRangeSpinBox.value()
+        start_index = self.startRangeSpinBox.value() \
+            if not self.downloadAllAvailableCheckbox.isChecked() \
+            else -1
+        stop_index = self.stopRangeSpinBox.value() \
+            if not self.downloadAllAvailableCheckbox.isChecked() \
+            else -1
 
         if start_index > stop_index:
             QMessageBox.critical(
@@ -127,7 +132,6 @@ class PyTubeForm(MainFormUi):
                 "Start value is greater than stop value")
             return
 
-        self.progressBar.setMaximum(stop_index - start_index + 1)
         self.progressBar.setValue(0)
         self.progressBar.repaint()
         # prevent user from initiating download while current download is running
@@ -139,6 +143,7 @@ class PyTubeForm(MainFormUi):
             # create new thread to download videos to prevent UI from freezing
             self.thread = _PlaylistDownloaderThread(url, download_base_path, audio_only, start_index, stop_index)
             # tell the main thread to update UI when progress is made
+            self.thread.initialized.connect(self.progressBar.setMaximum)
             self.thread.next_video_title.connect(self.downloadStatusLabel.setText)
             self.thread.progress.connect(self.progressBar.setValue)
             self.thread.finished.connect(self._playlist_download_completed)
@@ -209,11 +214,27 @@ class PyTubeForm(MainFormUi):
         """
         user_selection: str = self.videoPlaylistSelectCombobox.currentText()
         if user_selection == "Video":
+            self.downloadAllAvailableCheckbox.setEnabled(False)
             self.startRangeSpinBox.setEnabled(False)
             self.stopRangeSpinBox.setEnabled(False)
         elif user_selection == "Playlist":
+            self.downloadAllAvailableCheckbox.setEnabled(True)
+            if self.downloadAllAvailableCheckbox.isChecked():
+                self.startRangeSpinBox.setEnabled(False)
+                self.stopRangeSpinBox.setEnabled(False)
+            else:
+                self.startRangeSpinBox.setEnabled(True)
+                self.stopRangeSpinBox.setEnabled(True)
+
+
+    def downloadAllAvailableCheckbox_changed(self):
+        if self.downloadAllAvailableCheckbox.isChecked():
+            self.startRangeSpinBox.setEnabled(False)
+            self.stopRangeSpinBox.setEnabled(False)
+        else:
             self.startRangeSpinBox.setEnabled(True)
             self.stopRangeSpinBox.setEnabled(True)
+
 
 
 class _VideoDownloaderThread(QThread):
@@ -246,6 +267,7 @@ class _VideoDownloaderThread(QThread):
 
 class _PlaylistDownloaderThread(QThread):
     """Downloads a single playlist of videos"""
+    initialized = QtCore.pyqtSignal(int)
     next_video_title = QtCore.pyqtSignal(str)
     progress = QtCore.pyqtSignal(int)
     finished = QtCore.pyqtSignal()
@@ -267,7 +289,10 @@ class _PlaylistDownloaderThread(QThread):
 
     def run(self):
         # playlist on youtube is 1-indexed, enumeration is 0-indexed. 
-        for i, video in enumerate(self.playlist.videos[self.start_index-1 : self.stop_index]): 
+        start: int = self.start_index - 1 if self.start_index > 0 else 0
+        stop: int = self.stop_index if self.stop_index > 0 else len(self.playlist.videos)
+        self.initialized.emit(stop - start)
+        for i, video in enumerate(self.playlist.videos[start : stop]): 
             self.next_video_title.emit(f"Downloading: {video.title}")
             if self.audio_only:
                 audio = video.streams.filter(only_audio=True).first().download(output_path=self.download_location)
