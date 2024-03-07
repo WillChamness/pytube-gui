@@ -42,6 +42,7 @@ To create a link to the desktop in Windows 10, follow these steps:
 ![Windows file explorer](./.github/windows-local-bin-folder.png)
 3. Right click `pytube-gui.exe`
 4. Hover over `Send to` and click `Desktop (create shortcut)`
+5. Rename the desktop link to `Pytube GUI`
 
 ### Via Python venv
 If you want to run the application in an isolated environment but don't want to use 
