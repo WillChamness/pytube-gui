@@ -4,9 +4,9 @@ from .form_logic.pytube_form import PyTubeForm
 def main():
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    pythonYTDownloaderForm = QtWidgets.QDialog()
-    ui = PyTubeForm(pythonYTDownloaderForm)
-    pythonYTDownloaderForm.show()
+    pythonYTDownloaderDialog = QtWidgets.QDialog()
+    ui = PyTubeForm(pythonYTDownloaderDialog)
+    pythonYTDownloaderDialog.show()
     sys.exit(app.exec())
 
 
