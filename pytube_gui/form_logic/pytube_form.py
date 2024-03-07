@@ -1,9 +1,9 @@
 import os
 import platform
 import time
-from typing import Union
-from pytube import YouTube, Playlist, exceptions as pytube_exceptions
+from pytube import exceptions as pytube_exceptions
 from ..form_ui.pytube_form import Ui_pythonYTDownloaderForm as MainFormUi # created from pyuic
+from .downloaders import *
 from PyQt6 import QtWidgets, QtCore 
 from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QMessageBox, QFileDialog 
@@ -12,7 +12,7 @@ class PyTubeForm(MainFormUi):
     def __init__(self, current_dialog: QtWidgets.QDialog):
         """Form Constructor"""
         super().__init__()
-        self.thread: Union[_VideoDownloaderThread, _PlaylistDownloaderThread] = None
+        self.thread: QThread = None
         # setup UI before defining logic
         self.dialog_window: QtWidgets.QDialog = current_dialog
         self.setupUi(self.dialog_window)
@@ -48,6 +48,8 @@ class PyTubeForm(MainFormUi):
             self._download_video()
         elif user_selection == "Playlist":
             self._download_playlist()
+        elif user_selection == "Captions":
+            self._download_captions()
         else: 
             QMessageBox.critical(
                 self.dialog_window, 
@@ -82,7 +84,7 @@ class PyTubeForm(MainFormUi):
         # attempt download
         try:
             # create new thread to download videos to prevent UI from freezing
-            self.thread = _VideoDownloaderThread(url, download_location, audio_only)
+            self.thread = VideoDownloaderThread(url, download_location, audio_only)
             # update UI when download starts and ends
             self.thread.initialized.connect(self.downloadStatusLabel.setText)
             self.thread.finished.connect(self._video_download_completed)
@@ -141,7 +143,7 @@ class PyTubeForm(MainFormUi):
         # attempt to download videos
         try:
             # create new thread to download videos to prevent UI from freezing
-            self.thread = _PlaylistDownloaderThread(url, download_base_path, audio_only, start_index, stop_index)
+            self.thread = PlaylistDownloaderThread(url, download_base_path, audio_only, start_index, stop_index)
             # tell the main thread to update UI when progress is made
             self.thread.initialized.connect(self.progressBar.setMaximum)
             self.thread.next_video_title.connect(self.downloadStatusLabel.setText)
@@ -186,6 +188,47 @@ class PyTubeForm(MainFormUi):
             self.downloadFolderBrowseButton.setEnabled(True)
 
 
+    def _download_captions(self):
+        download_location: str = self.downloadFolderTextbox.text()
+        url: str = self.urlTextbox.text()
+
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(1)
+        self.progressBar.setValue(0)
+        # prevent user from initiating download while current download is running
+        self.startButton.setEnabled(False)
+        self.downloadFolderBrowseButton.setEnabled(False)
+        # attempt download
+        try:
+            # create new thread to download videos to prevent UI from freezing
+            self.thread = CaptionsDownloaderThread(url, download_location)
+            # update UI when download starts and ends
+            self.thread.initialized.connect(self.downloadStatusLabel.setText)
+            self.thread.finished.connect(self._captions_download_completed)
+
+            # start the thread
+            self.thread.start()
+            
+        except pytube_exceptions.RegexMatchError as rme:
+            QMessageBox.critical(
+                self.dialog_window, 
+                "Something went wrong", 
+                "Could not find video. Check to make sure the URL is correct.")
+            print(rme)
+            self.startButton.setEnabled(True)
+            self.downloadFolderBrowseButton.setEnabled(True)
+        except pytube_exceptions.PytubeError as pe:
+            QMessageBox.critical(
+                self.dialog_window,
+                "Something went wrong",
+                "Could not download captions. Maybe no captions are available?"
+            )
+            print(pe)
+            self.startButton.setEnabled(True)
+            self.downloadFolderBrowseButton.setEnabled(True)
+
+
+
     def _video_download_completed(self):
         """Performs chores when the video download is complete"""
         self.progressBar.setValue(1) # do this first
@@ -204,6 +247,16 @@ class PyTubeForm(MainFormUi):
         self.startButton.setEnabled(True)
         del self.thread
 
+
+    def _captions_download_completed(self):
+        """Performs chores when the captions download is complete"""
+        self.progressBar.setValue(1) # do this first
+        QMessageBox.information(self.dialog_window, "Success!", "Caption download complete") # this second
+        self.downloadStatusLabel.setText("") # this third
+        self.downloadFolderBrowseButton.setEnabled(True)
+        self.startButton.setEnabled(True)
+        del self.thread
+
    
     def videoPlaylistSelectCombobox_changed(self):
         """
@@ -213,18 +266,25 @@ class PyTubeForm(MainFormUi):
         on whether or not a video or playlist is being downloaded.
         """
         user_selection: str = self.videoPlaylistSelectCombobox.currentText()
-        if user_selection == "Video":
+        if user_selection == "Video": 
             self.downloadAllAvailableCheckbox.setEnabled(False)
             self.startRangeSpinBox.setEnabled(False)
             self.stopRangeSpinBox.setEnabled(False)
+            self.audioOnlyCheckbox.setEnabled(True)
         elif user_selection == "Playlist":
             self.downloadAllAvailableCheckbox.setEnabled(True)
+            self.audioOnlyCheckbox.setEnabled(True)
             if self.downloadAllAvailableCheckbox.isChecked():
                 self.startRangeSpinBox.setEnabled(False)
                 self.stopRangeSpinBox.setEnabled(False)
             else:
                 self.startRangeSpinBox.setEnabled(True)
                 self.stopRangeSpinBox.setEnabled(True)
+        elif user_selection == "Captions":
+            self.downloadAllAvailableCheckbox.setEnabled(False)
+            self.startRangeSpinBox.setEnabled(False)
+            self.stopRangeSpinBox.setEnabled(False)
+            self.audioOnlyCheckbox.setEnabled(False)
 
 
     def downloadAllAvailableCheckbox_changed(self):
@@ -236,72 +296,3 @@ class PyTubeForm(MainFormUi):
             self.stopRangeSpinBox.setEnabled(True)
 
 
-
-class _VideoDownloaderThread(QThread):
-    """Downloads a single video"""
-    initialized = QtCore.pyqtSignal(str)
-    finished = QtCore.pyqtSignal()
-
-    def __init__(self, url: str, download_location: str, audio_only: bool):
-        super().__init__()
-        self.video: YouTube = YouTube(url)
-        self.download_location: str = download_location
-        self.audio_only: bool = audio_only
-
-
-    def run(self):
-        self.initialized.emit(f"Downloading: {self.video.title}")
-        if self.audio_only:
-            audio = self.video.streams.filter(only_audio=True).first().download(output_path=self.download_location)
-            # rename to .mp3
-            base, ext = os.path.splitext(audio)
-            try:
-                os.remove(base + ".mp3") # this file might exist already. if it does, can't perform rename
-            except OSError:
-                pass
-            os.rename(audio, base + ".mp3")
-        else:
-            self.video.streams.get_highest_resolution().download(self.download_location)
-        self.finished.emit()
-
-
-class _PlaylistDownloaderThread(QThread):
-    """Downloads a single playlist of videos"""
-    initialized = QtCore.pyqtSignal(int)
-    next_video_title = QtCore.pyqtSignal(str)
-    progress = QtCore.pyqtSignal(int)
-    finished = QtCore.pyqtSignal()
-
-    def __init__(self, url: str, download_base_path: str, audio_only: bool, start_index: int, stop_index: int):
-        super().__init__()
-        self.playlist: Playlist = Playlist(url)
-        self.audio_only: bool = audio_only
-        self.start_index: int = start_index
-        self.stop_index: int = stop_index
-
-        if len(self.playlist.videos) < start_index or len(self.playlist.videos) < stop_index:
-            raise ValueError("Start or stop value is too large")
-
-        # put all downloaded files into its own directory
-        self.download_location: str = os.path.join(download_base_path, self.playlist.title)
-        os.mkdir(self.download_location)
-
-
-    def run(self):
-        # playlist on youtube is 1-indexed, enumeration is 0-indexed. 
-        start: int = self.start_index - 1 if self.start_index > 0 else 0
-        stop: int = self.stop_index if self.stop_index > 0 else len(self.playlist.videos)
-        self.initialized.emit(stop - start)
-        for i, video in enumerate(self.playlist.videos[start : stop]): 
-            self.next_video_title.emit(f"Downloading: {video.title}")
-            if self.audio_only:
-                audio = video.streams.filter(only_audio=True).first().download(output_path=self.download_location)
-                # rename to .mp3
-                base, ext = os.path.splitext(audio)
-                os.rename(audio, base + ".mp3")
-            else:
-                video.streams.get_highest_resolution().download(self.download_location)
-            self.progress.emit(i+1) # i+1 videos downloaded so far
-        self.finished.emit()
-
-            

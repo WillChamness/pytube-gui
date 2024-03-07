@@ -49,6 +49,11 @@
      <string>Playlist</string>
     </property>
    </item>
+   <item>
+    <property name="text">
+     <string>Captions</string>
+    </property>
+   </item>
   </widget>
   <widget class="QLabel" name="urlLabel">
    <property name="geometry">
