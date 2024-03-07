@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file './qt-forms/pytube_form.ui'
+# Form implementation generated from reading ui file './qt-forms\pytube_form.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
