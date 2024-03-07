@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file './qt-forms\pytube_form.ui'
+# Form implementation generated from reading ui file './qt-forms/pytube_form.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -22,6 +22,7 @@ class Ui_pythonYTDownloaderForm(object):
 		self.videoPlaylistSelectCombobox = QtWidgets.QComboBox(parent=pythonYTDownloaderForm)
 		self.videoPlaylistSelectCombobox.setGeometry(QtCore.QRect(130, 120, 101, 25))
 		self.videoPlaylistSelectCombobox.setObjectName("videoPlaylistSelectCombobox")
+		self.videoPlaylistSelectCombobox.addItem("")
 		self.videoPlaylistSelectCombobox.addItem("")
 		self.videoPlaylistSelectCombobox.addItem("")
 		self.urlLabel = QtWidgets.QLabel(parent=pythonYTDownloaderForm)
@@ -122,6 +123,7 @@ class Ui_pythonYTDownloaderForm(object):
 		self.videoPlaylistSelectCombobox.setPlaceholderText(_translate("pythonYTDownloaderForm", "Select One"))
 		self.videoPlaylistSelectCombobox.setItemText(0, _translate("pythonYTDownloaderForm", "Video"))
 		self.videoPlaylistSelectCombobox.setItemText(1, _translate("pythonYTDownloaderForm", "Playlist"))
+		self.videoPlaylistSelectCombobox.setItemText(2, _translate("pythonYTDownloaderForm", "Captions"))
 		self.urlLabel.setText(_translate("pythonYTDownloaderForm", "URL:"))
 		self.downloadFolderLabel.setText(_translate("pythonYTDownloaderForm", "Download Folder:"))
 		self.downloadFolderBrowseButton.setText(_translate("pythonYTDownloaderForm", "Browse"))
