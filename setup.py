@@ -12,7 +12,7 @@ setup(
     long_description_content_type="text/markdown",
     packages=find_packages(),
     install_requires=["pytube>=15.0.0", "PyQt6>=6.0.0"],
-    pytube_requires=">=3.8",
+    python_requires=">=3.8",
     entry_points={
         "gui_scripts": ["pytube-gui = pytube_gui:run"]
     },
