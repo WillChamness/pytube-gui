@@ -21,11 +21,29 @@ Check the "Audio only" checkbox to download the video or playlist as `.mp3` file
 
 ## Installation
 
-### Prerequisites
+### Windows Executable
 
-- Python 3.8+
+Check out the `Releases` page for executable files for Windows. It contains a `.exe` and a `.zip`
+file to download. 
 
-### Via pipx
+#### Should I download the EXE or the ZIP?
+
+A single `.exe` file is more convenient to use than a folder containing multiple files. 
+However, Python is not designed to be used as an executable binary file. The `Onefile` executable
+can get very large as projects add more features. The result is unacceptable waiting times
+as the program loads. This project, however, is lightweight with minimal dependencies. 
+Although you may notice a small period of time while the program loads, the waiting time is likely
+acceptable. The `.exe` is ideal if you don't plan to use this app very often. If you use this app
+frequently or simply find yourself annoyed at the initial loading time, consider downloading the
+`.zip` file instead.
+
+### Running with Python (recommended)
+
+#### Prerequisites
+
+Python 3.8+
+
+#### Via pipx
 
 It is generally recommended to isolate Python applications from each other.
 [Pipx](https://github.com/pypa/pipx) is recommended for easily creating Python
@@ -49,12 +67,12 @@ To create a link to the desktop in Windows 10, follow these steps:
 5. Rename the desktop link to `Pytube GUI`
 
 After adding a link to the desktop, the application should appear when searching
-for it.
+for it. You don't have to add a new link when upgrading to a new version.
 
 If you're using Linux, the application should appear in your application launcher
 if the launcher's PATH includes `$HOME/.local/bin/`.
 
-### Via Python venv
+#### Via Python venv
 
 If you want to run the application in an isolated environment but don't want to use
 `pipx`, you can install it using `python-venv`. Clone this repo with `git` or
@@ -74,7 +92,7 @@ source env/bin/activate || env\Scripts\activate
 python run.py || python3 run.py
 ```
 
-### Via pip globally (not recommended)
+#### Via pip globally (not recommended)
 
 It is not recommended to install applications globally via `pip` as updates
 to dependencies may break various applications. Furthermore, some package
