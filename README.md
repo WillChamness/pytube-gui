@@ -2,7 +2,7 @@
 
 ![YouTube Downloader](./.github/youtube-downloader.png)
 
-A graphical application for interacting with [pytube](https://github.com/pytube/pytube).
+A simple and lightweight graphical application for interacting with [pytube](https://github.com/pytube/pytube).
 
 ## Features
 
@@ -45,7 +45,8 @@ frequently or simply find yourself annoyed at the initial loading time, consider
 
 #### Prerequisites
 
-Python 3.8+
+- Python 3.8+
+- Git
 
 #### Via pipx
 
