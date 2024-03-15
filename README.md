@@ -27,8 +27,8 @@ Same instructions as downloading a video, but select the "Captions" options inst
 
 ### Windows Executable
 
-Check out the `Releases` page for executable files for Windows. It contains a `.exe` and a `.zip`
-file to download. 
+Check out the [Releases](https://github.com/WillChamness/pytube-gui/releases) page for executable files 
+for Windows. It contains a `.exe` and a `.zip` file to download. 
 
 #### Should I download the EXE or the ZIP?
 
