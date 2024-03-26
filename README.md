@@ -2,7 +2,7 @@
 
 ![YouTube Downloader](./.github/youtube-downloader.png)
 
-A graphical application for interacting with [pytube](https://github.com/pytube/pytube).
+A simple and lightweight graphical application for interacting with [pytube](https://github.com/pytube/pytube).
 
 ## Features
 
@@ -27,8 +27,8 @@ Same instructions as downloading a video, but select the "Captions" options inst
 
 ### Windows Executable
 
-Check out the `Releases` page for executable files for Windows. It contains a `.exe` and a `.zip`
-file to download. 
+Check out the [Releases](https://github.com/WillChamness/pytube-gui/releases) page for executable files 
+for Windows. It contains a `.exe` and a `.zip` file to download. 
 
 #### Should I download the EXE or the ZIP?
 
@@ -45,7 +45,8 @@ frequently or simply find yourself annoyed at the initial loading time, consider
 
 #### Prerequisites
 
-Python 3.8+
+- Python 3.8+
+- Git
 
 #### Via pipx
 
