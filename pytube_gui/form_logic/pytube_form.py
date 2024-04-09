@@ -1,8 +1,6 @@
 import os
 import platform
-import time
 
-import PyQt6
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
@@ -162,6 +160,7 @@ class PyTubeForm(MainFormUi):
 
         # attempt to download videos
         try:
+            assert url is not None and url != ""
             # create new thread to download videos to prevent UI from freezing
             self.thread = PlaylistDownloaderThread(
                 url, download_base_path, audio_only, start_index, stop_index
@@ -174,6 +173,7 @@ class PyTubeForm(MainFormUi):
 
             # begin the download
             self.thread.start()
+
         except FileExistsError as fee:
             QMessageBox.critical(
                 self.dialog_window,
@@ -199,6 +199,15 @@ class PyTubeForm(MainFormUi):
                 "Could not download video. Check to make sure the URL is correct.",
             )
             print(pe)
+            self.startButton.setEnabled(True)
+            self.downloadFolderBrowseButton.setEnabled(True)
+        except AssertionError as ae:
+            QMessageBox.critical(
+                self.dialog_window,
+                "Something went wrong",
+                "Could not find playlist. Check to make sure the URL is correct.",
+            )
+            print(ae)
             self.startButton.setEnabled(True)
             self.downloadFolderBrowseButton.setEnabled(True)
         except ValueError as ve:
