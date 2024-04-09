@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="pytube_gui",
-    version="0.1.2",
+    version="0.1.3",
     license="GPLv3",
     description="A Qt application for the pytube library",
     long_description=long_description,
